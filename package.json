@@ -1,0 +1,20 @@
+{
+  "name": "novora-hub",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3001",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@vercel/kv": "^2.0.0",
+    "autoprefixer": "^10.5.0",
+    "next": "14.2.5",
+    "postcss": "^8.5.12",
+    "react": "^18",
+    "react-dom": "^18",
+    "tailwindcss": "^3.4.19"
+  }
+}
