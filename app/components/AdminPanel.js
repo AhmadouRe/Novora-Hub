@@ -111,7 +111,7 @@ export default function AdminPanel({ session, onClose }) {
 
   async function saveTool() {
     setLoading(true);
-    const r = await fetch(`/api/hub/tools/${editTool.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: editName, description: editDesc, category: editCategory, color: editColor, perUser: editPerUser, visibility: editVisibility }) });
+    const r = await fetch(`/api/hub/tools/${editTool.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: editName, description: editDesc, category: editCategory, color: editTool.color, perUser: editTool.perUser, visibility: editTool.visibility }) });
     if (r.ok) { flash('Tool updated'); setEditTool(null); loadTools(); }
     else { const d = await r.json(); flash(d.error || 'Failed'); }
     setLoading(false);
@@ -239,23 +239,6 @@ export default function AdminPanel({ session, onClose }) {
                     <div style={{ fontSize: 12, color: 'var(--text2)', marginBottom: 6 }}>Category</div>
                     <input style={inp} value={editCategory} onChange={e => setEditCategory(e.target.value)} />
                   </div>
-                  <div>
-                    <div style={{ fontSize: 12, color: 'var(--text2)', marginBottom: 8 }}>Color</div>
-                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                      {COLORS.map(c => <div key={c} onClick={() => setEditColor(c)} style={{ width: 28, height: 28, borderRadius: '50%', background: c, border: editColor === c ? '3px solid #fff' : '3px solid transparent', cursor: 'pointer', outline: editColor === c ? `2px solid ${c}` : 'none' }} />)}
-                    </div>
-                  </div>
-                  <div>
-                    <div style={{ fontSize: 12, color: 'var(--text2)', marginBottom: 6 }}>Visibility</div>
-                    <select style={inp} value={editVisibility} onChange={e => setEditVisibility(e.target.value)}>
-                      <option value="everyone">Everyone</option>
-                      <option value="justme">Just Me</option>
-                    </select>
-                  </div>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, cursor: 'pointer' }}>
-                    <input type="checkbox" checked={editPerUser} onChange={e => setEditPerUser(e.target.checked)} />
-                    Per-user URLs (each user sets their own URL)
-                  </label>
                   <div style={{ display: 'flex', gap: 10 }}>
                     <button style={btn()} onClick={saveTool} disabled={loading}>Save</button>
                     <button style={{ ...btn(), background: 'var(--surface2)', color: 'var(--text)', border: '1px solid var(--border)' }} onClick={() => setEditTool(null)}>Cancel</button>
