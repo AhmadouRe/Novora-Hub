@@ -127,12 +127,13 @@ export default function HubApp({ session }) {
         {metrics && (
           <div style={{ marginBottom: 28 }}>
             <div style={{ fontSize: 13, color: 'var(--text2)', marginBottom: 14 }}>Good {greeting}, {session.userName} — Command Center</div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14, marginBottom: 16 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 14, marginBottom: 16 }}>
               {[
                 { label: 'Days to Goal', value: metrics.daysLeft, color: daysColor, sub: metrics.endDate },
                 { label: 'Revenue', value: fmt(metrics.totalRevenue), color: 'var(--gold)', sub: `${metrics.goalPct}% of ${fmt(metrics.goalAmt)} · ${metrics.dealsCount} deals` },
                 { label: 'Deals Needed', value: Math.max(0, Math.ceil((metrics.goalAmt - metrics.totalRevenue) / 9000)), color: 'var(--cyan)', sub: 'more at $9K avg' },
-                { label: 'Today', value: `${metrics.todayWcl + metrics.todaySms}`, color: 'var(--green)', sub: `${metrics.todayWcl} WCL · ${metrics.todaySms} SMS logged` },
+                { label: 'Leads Logged Today', value: `${metrics.todaySms}`, color: 'var(--green)', sub: 'SMS pipeline entries today' },
+                { label: 'Days Active', value: Math.floor((Date.now() - new Date('2026-04-25').getTime()) / 86400000), color: 'var(--purple)', sub: 'since Apr 25, 2026' },
               ].map(({ label, value, color, sub }) => (
                 <div key={label} style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '16px 18px' }}>
                   <div style={{ fontSize: 12, color: 'var(--text2)', marginBottom: 4 }}>{label}</div>
@@ -164,6 +165,23 @@ export default function HubApp({ session }) {
           </div>
         )}
 
+        {/* Daily Ops Status Strip */}
+        {metrics && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '14px 18px', marginBottom: 20 }}>
+            {[
+              { label: 'Texts Sent Today', value: metrics.todaySms > 0 ? metrics.todaySms : '—', color: 'var(--purple)' },
+              { label: 'Qualified Today', value: '—', color: 'var(--gold)' },
+              { label: 'Offers Today', value: '—', color: 'var(--cyan)' },
+              { label: 'Contracts Today', value: '—', color: 'var(--green)' },
+            ].map(item => (
+              <div key={item.label} style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: 22, fontFamily: 'JetBrains Mono,monospace', fontWeight: 700, color: item.color }}>{item.value}</div>
+                <div style={{ fontSize: 11, color: 'var(--text3)', marginTop: 2 }}>{item.label}</div>
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* Search + Category filters */}
         <div style={{ marginBottom: 20 }}>
           <input ref={searchRef} style={{ width: '100%', padding: '11px 16px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, color: 'var(--text)', fontSize: 15, marginBottom: 12 }} placeholder="Search tools… (press / to focus)" value={search} onChange={e => setSearch(e.target.value)} />
@@ -177,16 +195,17 @@ export default function HubApp({ session }) {
         {/* Tool Grid */}
         {Object.entries(grouped).map(([category, catTools]) => (
           <div key={category} style={{ marginBottom: 28 }}>
-            <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text3)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>{category}</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text2)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12, borderLeft: '3px solid var(--gold)', paddingLeft: 10 }}>{category}</div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 14 }}>
               {catTools.map(tool => {
                 const personalUrl = myUrls[tool.id];
                 const hasPersonal = tool.perUser && !!personalUrl;
                 const hasAnyUrl = hasPersonal || !!tool.globalUrl;
                 return (
-                  <div key={tool.id} style={{ background: 'var(--surface)', border: `1px solid ${tool.color}33`, borderRadius: 14, padding: '18px 18px 14px', display: 'flex', flexDirection: 'column', gap: 10, transition: 'border-color 0.15s' }}
+                  <div key={tool.id} style={{ background: 'var(--surface)', border: `1px solid ${tool.color}33`, borderRadius: 14, padding: '18px 18px 14px', display: 'flex', flexDirection: 'column', gap: 10, transition: 'border-color 0.15s', position: 'relative' }}
                     onMouseEnter={e => e.currentTarget.style.borderColor = tool.color + '88'}
                     onMouseLeave={e => e.currentTarget.style.borderColor = tool.color + '33'}>
+                    <span style={{ position: 'absolute', top: 10, right: 10, fontSize: 10, padding: '1px 6px', borderRadius: 6, background: tool.color + '18', color: tool.color, fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', border: `1px solid ${tool.color}33` }}>{tool.category}</span>
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
                       <div style={{ width: 44, height: 44, borderRadius: 10, background: tool.color + '18', border: `1px solid ${tool.color}44`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, color: tool.color, flexShrink: 0 }}>{tool.icon}</div>
                       <div style={{ flex: 1, minWidth: 0 }}>
